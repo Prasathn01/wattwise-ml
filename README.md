@@ -6,7 +6,7 @@ Machine-learning analysis of one household's electricity use from the UCI *Indiv
 |---|---|
 | PBL 1: Units 1 and 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Prasathn01/wattwise-ml/blob/main/notebooks/PBL1_Units1_2.ipynb) |
 | PBL 2: Units 3 and 4 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Prasathn01/wattwise-ml/blob/main/notebooks/PBL2_Units3_4.ipynb) |
-| PBL 3: Unit 5 | *to be added* |
+| PBL 3: Unit 5 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Prasathn01/wattwise-ml/blob/main/notebooks/PBL3_Unit5.ipynb) |
 
 ## Team and course
 
@@ -71,17 +71,18 @@ wattwise-ml/
 ├── requirements-test.txt       extra packages needed only by tests/
 ├── notebooks/
 │   ├── PBL1_Units1_2.ipynb     PBL 1 (Units 1-2), outputs kept
-│   └── PBL2_Units3_4.ipynb     PBL 2 (Units 3-4), outputs kept
+│   ├── PBL2_Units3_4.ipynb     PBL 2 (Units 3-4), outputs kept
+│   └── PBL3_Unit5.ipynb        PBL 3 (Unit 5)
 ├── tests/
-│   └── verify_pbl2.py          checks the from-scratch PBL 2 code against standard libraries
+│   └── verify_pbl2.py          checks the from-scratch PBL 2 code against standard libraries (to be added)
 ├── results/
 │   └── pbl2_results.json       numbers printed by the PBL 2 run
 ├── figures/
 │   └── pbl2/                   PNG figures from the PBL 2 run
-└── docs/                       PBL 1 and PBL 2 reports and review slides (PDF)
+└── docs/                       PBL 1 and PBL 2 reports; PBL 1, 2 and 3 review slides (PDF)
 ```
 
-The PBL 3 notebook (`notebooks/PBL3_Unit5.ipynb`), its results (`results/pbl3_results.json`) and figures (`figures/pbl3/`) will be added when the Unit 5 review is complete.
+The PBL 3 notebook writes `results_unit5.json` and its figures to `figures/` when it runs.
 
 ## How to run
 
@@ -198,7 +199,41 @@ PBL 1 and PBL 2 use different preprocessing (hour-completeness rules, splits and
 
 ## PBL 3 summary: Unit 5
 
-To be added when the Unit 5 notebook is complete. It will revisit the PBL 1 peak-hour task (same features, threshold and 2010 test year) with CART, bagging, random forests, AdaBoost, gradient boosting, a GAM, Bayesian model averaging and stacking.
+Notebook: [`notebooks/PBL3_Unit5.ipynb`](notebooks/PBL3_Unit5.ipynb). Slides: [`docs/PBL3_Review_Slides.pdf`](docs/PBL3_Review_Slides.pdf).
+
+PBL 3 uses exactly the same task, features, training years and 2010 test year as PBL 1, so its results can be compared with the PBL 1 classification table (but not with PBL 2).
+
+**Methods**
+
+- **Task:** the PBL 1 peak-hour task. The notebook rebuilds the PBL 1 data from the raw file: hourly means, time interpolation of gaps up to 3 hours, 399 outage hours dropped, the same 37 features, τ = 1.596 kW, training on 26,191 hours from 2006–09 and testing on 7,264 hours in 2010. As a check it prints the persistence RMSE, which equals the PBL 1 value of 0.618 kW.
+- **Libraries:** pandas, NumPy, scikit-learn and matplotlib. Libraries are allowed for Units 4 and 5.
+- **Models:** CART with cost-complexity pruning, bagging, random forest, AdaBoost, gradient boosting, a logistic GAM with cubic splines, Bayesian model averaging (BMA) and stacking. Logistic regression is refitted as the PBL 1 reference.
+- **Model selection:** `TimeSeriesSplit(4)` on the training years only, choosing the setting with the best mean ROC-AUC. The 2010 test year is used once. BMA weights and stacking are fitted on the last 20% of the training years.
+
+**Results on the 2010 test year (7,264 hours, threshold 0.5)**
+
+| Model | Accuracy | Precision | Recall | F1 | ROC-AUC | Brier | Log-loss |
+|---|---|---|---|---|---|---|---|
+| Logistic regression (PBL 1 reference) | 0.851 | 0.755 | 0.495 | 0.598 | 0.902 | 0.104 | 0.325 |
+| CART (depth 12, leaf 100, pruned) | 0.839 | 0.671 | 0.551 | 0.605 | 0.885 | 0.110 | 0.343 |
+| Bagging (200 trees) | 0.858 | 0.718 | 0.605 | 0.656 | 0.906 | 0.099 | 0.314 |
+| Random forest (400 trees) | 0.860 | 0.729 | 0.593 | 0.654 | 0.910 | 0.098 | 0.312 |
+| AdaBoost (400 depth-2 trees) | 0.856 | 0.709 | 0.604 | 0.652 | 0.904 | 0.172 | 0.530 |
+| Gradient boosting (300 trees, depth 3) | 0.862 | 0.731 | 0.608 | **0.664** | 0.913 | **0.095** | 0.304 |
+| GAM (logistic, splines) | 0.859 | 0.748 | 0.556 | 0.638 | 0.908 | 0.099 | 0.314 |
+| Bayesian model averaging | 0.862 | 0.731 | 0.608 | 0.664 | 0.913 | 0.095 | 0.304 |
+| Stacking | **0.864** | 0.757 | 0.578 | 0.655 | **0.915** | 0.096 | **0.302** |
+
+**Key findings**
+
+- Gradient boosting raises ROC-AUC from 0.902 (PBL 1 Bayesian logistic regression) to 0.913, and F1 from 0.599 to 0.664, on the same test hours.
+- A single pruned tree is worse than the PBL 1 model (ROC-AUC 0.885); the gain comes from averaging and boosting.
+- BMA puts weight 1.000 on gradient boosting, so it equals that model. Stacking adds only 0.002 ROC-AUC.
+- AdaBoost ranks hours well but its probabilities are over-confident (log-loss 0.530, Brier 0.172).
+- With a threshold of 0.38, chosen on the training years, gradient boosting reaches recall 0.734, precision 0.668 and F1 0.699 on 2010.
+- The previous hour's load is by far the most important feature.
+
+These PBL 3 numbers are taken from the PBL-III review slides. The committed notebook does not yet contain saved outputs.
 
 ## Implementation and verification
 
@@ -218,7 +253,8 @@ EM finds a local maximum, so for the Gaussian mixture the test checks that sciki
 - The data come from one household, so the findings do not generalise to other homes without further work.
 - Hourly averages hide which appliance caused a spike within the hour.
 - No weather data are used, although temperature drives the heating and cooling load.
-- PBL 1 and PBL 2 use different preprocessing, so their results cannot be compared directly.
+- PBL 1 and PBL 2 use different preprocessing, so their results cannot be compared directly. PBL 3 uses the PBL 1 preprocessing.
+- PBL 3 is evaluated on a single test year, 2010.
 
 ## Contributions
 
