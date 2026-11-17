@@ -161,7 +161,7 @@ Notebook: [`notebooks/PBL2_Units3_4.ipynb`](notebooks/PBL2_Units3_4.ipynb). Repo
 **Exploratory analysis**
 
 - Hourly mean 1.09 kW, median 0.80 kW.
-- Weekday peaks at 07:00 (1.72 kW) and 21:00 (1.86 kW).
+- On weekdays the busiest hour is 21:00 (1.86 kW) and the quietest is 03:00 (0.41 kW), with a second, smaller peak in the morning around 07:00.
 - December averages 1.49 kW and August 0.57 kW.
 - Autocorrelation is 0.71 at 1 hour, 0.44 at 24 hours and 0.46 at 168 hours.
 
