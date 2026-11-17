@@ -1,0 +1,8 @@
+# Packages needed to run the notebooks (PBL 1 also uses seaborn and SciPy; scikit-learn is used by PBL 1 and PBL 3 only)
+numpy
+pandas
+matplotlib
+seaborn
+scipy
+scikit-learn
+nbformat

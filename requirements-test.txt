@@ -1,0 +1,6 @@
+# Only needed for tests/verify_pbl2.py, which checks the from-scratch PBL 2 code against standard libraries
+-r requirements.txt
+scikit-learn
+scipy
+hmmlearn
+statsmodels
