@@ -72,17 +72,17 @@ wattwise-ml/
 ├── notebooks/
 │   ├── PBL1_Units1_2.ipynb     PBL 1 (Units 1-2), outputs kept
 │   ├── PBL2_Units3_4.ipynb     PBL 2 (Units 3-4), outputs kept
-│   └── PBL3_Unit5.ipynb        PBL 3 (Unit 5)
+│   └── PBL3_Unit5.ipynb        PBL 3 (Unit 5), outputs kept
 ├── tests/
 │   └── verify_pbl2.py          checks the from-scratch PBL 2 code against standard libraries (to be added)
 ├── results/
-│   └── pbl2_results.json       numbers printed by the PBL 2 run
+│   ├── pbl2_results.json       numbers printed by the PBL 2 run
+│   └── pbl3_results.json       numbers printed by the PBL 3 run
 ├── figures/
-│   └── pbl2/                   PNG figures from the PBL 2 run
+│   ├── pbl2/                   PNG figures from the PBL 2 run
+│   └── pbl3/                   PNG figures from the PBL 3 run
 └── docs/                       PBL 1 and PBL 2 reports; PBL 1, 2 and 3 review slides (PDF)
 ```
-
-The PBL 3 notebook writes `results_unit5.json` and its figures to `figures/` when it runs.
 
 ## How to run
 
@@ -199,7 +199,7 @@ PBL 1 and PBL 2 use different preprocessing (hour-completeness rules, splits and
 
 ## PBL 3 summary: Unit 5
 
-Notebook: [`notebooks/PBL3_Unit5.ipynb`](notebooks/PBL3_Unit5.ipynb). Slides: [`docs/PBL3_Review_Slides.pdf`](docs/PBL3_Review_Slides.pdf).
+Notebook: [`notebooks/PBL3_Unit5.ipynb`](notebooks/PBL3_Unit5.ipynb). Slides: [`docs/PBL3_Review_Slides.pdf`](docs/PBL3_Review_Slides.pdf). Numbers: [`results/pbl3_results.json`](results/pbl3_results.json). Figures: [`figures/pbl3/`](figures/pbl3/).
 
 PBL 3 uses exactly the same task, features, training years and 2010 test year as PBL 1, so its results can be compared with the PBL 1 classification table (but not with PBL 2).
 
@@ -233,7 +233,7 @@ PBL 3 uses exactly the same task, features, training years and 2010 test year as
 - With a threshold of 0.38, chosen on the training years, gradient boosting reaches recall 0.734, precision 0.668 and F1 0.699 on 2010.
 - The previous hour's load is by far the most important feature.
 
-These PBL 3 numbers are taken from the PBL-III review slides. The committed notebook does not yet contain saved outputs.
+The PBL 3 notebook runs much longer than the others because of the grid searches; the AdaBoost search alone takes several minutes.
 
 ## Implementation and verification
 
